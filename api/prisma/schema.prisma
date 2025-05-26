@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Campaign {
+  id         Int            @id @default(autoincrement())
+  name       String
+  status     CampaignStatus
+  startDate  DateTime
+  endDate    DateTime
+  categoryId Int
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  deletedAt  DateTime?      @map("deleted_at")
+  category   Category      @relation(fields: [categoryId], references: [id])
+
+  @@index([categoryId])
+  @@map("campaigns")
+}
+
+model Category {
+  id       Int        @id @default(autoincrement())
+  name     String
+  Campaign Campaign[]
+
+  @@map("categories")
+}
+
+enum CampaignStatus {
+  ACTIVE
+  PAUSED
+  EXPIRED
+}
